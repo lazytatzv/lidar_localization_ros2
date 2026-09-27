@@ -2,8 +2,8 @@
 PCLLocalization::PCLLocalization(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("lidar_localization", options),
   clock_(RCL_ROS_TIME),
-  tfbuffer_(std::make_shared<rclcpp::Clock>(clock_)),
-  tflistener_(tfbuffer_),
+  tfbuffer_(get_clock()),
+  tflistener_(tfbuffer_, this, false),
   broadcaster_(this)
 {
   declare_parameter("global_frame_id", "map");
