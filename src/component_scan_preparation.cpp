@@ -233,13 +233,18 @@ PCLLocalization::PreparedScanCloud PCLLocalization::prepareScanForRegistration(
         base_to_lidar_stamped = tfbuffer_.lookupTransform(
           base_frame_id_, msg->header.frame_id, msg->header.stamp,
           rclcpp::Duration::from_seconds(0.1));
-      } catch (const tf2::TransformException & ex) {
-        prepared_scan.status =
-          lidar_localization::classifyPreparedScan(true, false, false);
-        RCLCPP_ERROR(
-          this->get_logger(), "Could not transform %s to %s: %s",
-          msg->header.frame_id.c_str(), base_frame_id_.c_str(), ex.what());
-        return prepared_scan;
+      } catch (const tf2::TransformException &) {
+        try {
+          base_to_lidar_stamped = tfbuffer_.lookupTransform(
+            base_frame_id_, msg->header.frame_id, tf2::TimePointZero);
+        } catch (const tf2::TransformException & ex) {
+          prepared_scan.status =
+            lidar_localization::classifyPreparedScan(true, false, false);
+          RCLCPP_ERROR(
+            this->get_logger(), "Could not transform %s to %s: %s",
+            msg->header.frame_id.c_str(), base_frame_id_.c_str(), ex.what());
+          return prepared_scan;
+        }
       }
 
       Eigen::Matrix4f initial_transformation =

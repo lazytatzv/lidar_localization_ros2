@@ -96,11 +96,16 @@ bool PCLLocalization::publishMapToOdomTransform(
   try {
     odom_to_base_link_msg = tfbuffer_.lookupTransform(
       odom_frame_id_, base_frame_id_, stamp, rclcpp::Duration::from_seconds(0.1));
-  } catch (tf2::TransformException & ex) {
-    RCLCPP_WARN(
-      this->get_logger(), "Could not get transform %s to %s: %s",
-      base_frame_id_.c_str(), odom_frame_id_.c_str(), ex.what());
-    return false;
+  } catch (const tf2::TransformException &) {
+    try {
+      odom_to_base_link_msg = tfbuffer_.lookupTransform(
+        odom_frame_id_, base_frame_id_, tf2::TimePointZero);
+    } catch (const tf2::TransformException & ex) {
+      RCLCPP_WARN(
+        this->get_logger(), "Could not get transform %s to %s: %s",
+        base_frame_id_.c_str(), odom_frame_id_.c_str(), ex.what());
+      return false;
+    }
   }
   const geometry_msgs::msg::TransformStamped map_to_odom =
     lidar_localization::composeMapToOdomTransform(
