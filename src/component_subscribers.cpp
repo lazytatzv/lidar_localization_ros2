@@ -177,11 +177,27 @@ void PCLLocalization::initializeRegistration()
   RCLCPP_INFO(get_logger(), "initializeRegistration end");
 }
 
-void PCLLocalization::initialPoseReceived(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+void PCLLocalization::initialPoseReceived(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg_in)
 {
+  auto msg = msg_in;
   auto state_lock = callback_state_coordinator_.lockState();
   if (shutting_down_.load(std::memory_order_acquire)) {return;}
   RCLCPP_INFO(get_logger(), "initialPoseReceived");
+
+  double pose_stamp_sec = stamp_to_sec(msg->header.stamp);
+  const double current_node_time = this->now().seconds();
+  if ((current_node_time < 1e8 && pose_stamp_sec > 1e8) ||
+      (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0) ||
+      (pose_stamp_sec > current_node_time + 1.0))
+  {
+    RCLCPP_WARN(
+      get_logger(),
+      "Sanitizing /initialpose timestamp from %.3f to current time %.3f to protect TF and scan filtering",
+      pose_stamp_sec, current_node_time);
+    auto sanitized_msg = std::make_shared<geometry_msgs::msg::PoseWithCovarianceStamped>(*msg);
+    sanitized_msg->header.stamp = this->now();
+    msg = sanitized_msg;
+  }
   const auto admission = lidar_localization::decideInitialPoseAdmission(
     lidar_localization::InitialPoseAdmissionInput{
       global_frame_id_,

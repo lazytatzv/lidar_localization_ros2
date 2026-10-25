@@ -182,6 +182,7 @@ void PCLLocalization::initializeParameters()
   get_parameter("vgicp_voxel_resolution", vgicp_voxel_resolution_);
   get_parameter("transform_epsilon", transform_epsilon_);
   get_parameter("voxel_leaf_size", voxel_leaf_size_);
+  get_parameter("output_z_offset", output_z_offset_);
   get_parameter("enable_scan_voxel_filter", enable_scan_voxel_filter_);
   get_parameter("scan_max_range", scan_max_range_);
   get_parameter("scan_min_range", scan_min_range_);

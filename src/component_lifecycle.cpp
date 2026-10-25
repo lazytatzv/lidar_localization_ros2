@@ -28,6 +28,7 @@ PCLLocalization::PCLLocalization(const rclcpp::NodeOptions & options)
   declare_parameter("vgicp_voxel_resolution", 1.0);
   declare_parameter("transform_epsilon", 0.01);
   declare_parameter("voxel_leaf_size", 0.2);
+  declare_parameter("output_z_offset", 0.0);
   declare_parameter("enable_scan_voxel_filter", true);
   declare_parameter("scan_max_range", 100.0);
   declare_parameter("scan_min_range", 1.0);

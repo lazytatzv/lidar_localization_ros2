@@ -373,6 +373,7 @@ public:
   double ndt_step_size_;
   double transform_epsilon_;
   double voxel_leaf_size_;
+  double output_z_offset_{0.0};
   bool enable_scan_voxel_filter_{true};
   int gicp_corr_randomness_;
   double gicp_max_correspondence_distance_;

@@ -7,6 +7,7 @@ void PCLLocalization::setCurrentPoseFromMatrix(
   corrent_pose_with_cov_stamped_ptr_->header.frame_id = global_frame_id_;
   corrent_pose_with_cov_stamped_ptr_->pose.pose =
     lidar_localization::poseFromMatrix(pose_matrix);
+  corrent_pose_with_cov_stamped_ptr_->pose.pose.position.z += output_z_offset_;
 }
 
 void PCLLocalization::publishCurrentPose(
